@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
 public class MyGridPane extends GridPane {
     public MyGridPane(){
@@ -27,9 +28,10 @@ public void addFour(Button button, Button button1, Button button2, Button button
         add(button3,3,0);
 
 }
-    public void addTime(TextField textField, MyText myText, TextField textField1){
+    public void addTime(TextField textField, MyText myText, TextField textField1, HBox hBox){
         add(textField,0,0);
         add(myText,1,0);
         add(textField1,2,0);
+        add(hBox,3,0);
 
 }}
