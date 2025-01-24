@@ -5,148 +5,260 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.w3c.dom.Text;
 
+//"C:\Users\nicny\IdeaProjects\try3"
+import java.io.BufferedReader;
 import java.sql.*;
 import java.util.Arrays;
 
-public class Try extends Application {
+public class Main extends Application {
+    // start of add doctor TextFields
+    TextField fNameText = new TextField();
+    TextField lNameText = new TextField();
+    TextField docPhoneText = new TextField();
+    TextField docPhoneText1 = new TextField();
+    TextField docPhoneText2 = new TextField();
+    TextField docYOEText = new TextField();
+    TextField docEduText = new TextField();
+    TextField docSpecializationText = new TextField();
+    // end of end doctor TextFields
+    TextField deletePatientText = new TextField();
+
+    // Start of add Patient TextFields
+    TextField patFnameText = new TextField();
+    TextField patLnameText = new TextField();
+    TextField patPhoneText = new TextField();
+    TextField patPhoneText1 = new TextField();
+    TextField patPhoneText2 = new TextField();
+    TextField patGenderText = new TextField();
+    // end add Patient TextFields
+
+    //Start of add Nurse TextFields
+    TextField nurseFnameText = new TextField();
+    TextField nurseLnameText = new TextField();
+    TextField nurseShiftStartText = new TextField();
+    TextField nurseShiftStartText1 = new TextField();
+    TextField nurseShiftEndText = new TextField();
+    TextField nurseShiftEndText1 = new TextField();
+    TextField nursePhoneText = new TextField();
+    TextField nursePhoneText1 = new TextField();
+    TextField nursePhoneText2 = new TextField();
+    TextField nurseDoctorText = new TextField();
+    // end of add Nurse TextFields
+
+    // Start of add Doctor Salary TextFields
+    TextField docDocSalaryIdText = new TextField();
+    TextField docSalaryStartText = new TextField();
+    TextField docSalaryStartText1 = new TextField();
+    TextField docSalaryStartText2 = new TextField();
+    TextField docSalaryEndText = new TextField();
+    TextField docSalaryEndText1 = new TextField();
+    TextField docSalaryEndText2 = new TextField();
+    TextField docSalaryAmountText = new TextField();
+    // end of add Doctor TextFields
+
+    // start of add Nurse Salary TextFields
+    TextField nurSalaryHistoryText = new TextField();
+    TextField nurSalaryStartText = new TextField();
+    TextField nurSalaryStartText1 = new TextField();
+    TextField nurSalaryStartText2 = new TextField();
+    TextField nurseSalaryEndText = new TextField();
+    TextField nurseSalaryEndText1 = new TextField();
+    TextField nurseSalaryEndText2 = new TextField();
+    TextField nurSalaryAmountText = new TextField();
+    // End of add nurse Salary TextFields
+
+    // start of add Medicine TextFields
+    TextField medicineNameText = new TextField();
+    TextField medicineDescriptionText = new TextField();
+    TextField medicineTreatmentText = new TextField();
+    // End of add Medicine TextFields
+
+    // Start of add Check In
+    MyText checkInDoc = new MyText("Doctor ID",15);
+    TextField checkInDocText = new TextField();
+    MyText checkInPat = new MyText("Patient ID",15);
+
+
+    TextField checkInPatText = new TextField();
+    TextField checkInTimeText = new TextField();
+    TextField checkInTImeText1 = new TextField();
+    TextField checkInDateText = new TextField();
+    TextField checkInDateText1 = new TextField();
+    TextField checkInDateText2 = new TextField();
+    // End of add Check In
+
+    // Start of add Order
+    TextField orderMedicineIDText = new TextField();
+    TextField orderPatientIDText = new TextField();
+    TextField orderAmountText = new TextField();
+    // End of add Order
+
+    // add Nurse Start Time toggle Initialization
+    ToggleGroup timeGroup = new ToggleGroup();
+    ToggleButton toggleAM = new ToggleButton("AM");
+    ToggleButton togglePM = new ToggleButton("PM");
+    // End of add Nurse Start Time Toggle
+
+    // Nurse End Time toggle Declaration
+    ToggleGroup timeGroup1 = new ToggleGroup();
+    ToggleButton toggleAM1 = new ToggleButton("AM");
+    ToggleButton togglePM1 = new ToggleButton("PM");
+    // End of add Nurse End Time Toggle
+
+    // add Check In Time toggle Declaration
+    ToggleGroup timeGroup2 = new ToggleGroup();
+    ToggleButton toggleAM2 = new ToggleButton("AM");
+    ToggleButton togglePM2 = new ToggleButton("PM");
+    // End of add Check In Time Toggle
+
+    // Update nurse shift start Toggle Declaration
+    ToggleGroup timeGroup3 = new ToggleGroup();
+    ToggleButton toggleAM3 = new ToggleButton("AM");
+    ToggleButton togglePM3 = new ToggleButton("PM");
+    // End of update nurse shift start
+
+    // update nurse shift end Toggle Declaration
+    ToggleGroup timeGroup4 = new ToggleGroup();
+    ToggleButton toggleAM4 = new ToggleButton("AM");
+    ToggleButton togglePM4 = new ToggleButton("PM");
+    // End of update nurse shift end
+
+    // update Check In time Toggle Declaration
+    ToggleGroup timeGroup5 = new ToggleGroup();
+    ToggleButton toggleAM5 = new ToggleButton("AM");
+    ToggleButton togglePM5 = new ToggleButton("PM");
+    // End of update Check In
+
+
+    // Use this to attempt to make myTexts a little less redundant
+    StringShorter stringShorter = new StringShorter();
+
+    public static void main(String[] args) {
+        launch(args);
+
+    }
+
     // connection to the sql database
     static final String DB_URL = "jdbc:mysql://127.0.0.1:3306/?user=root";
     static final String USER = "root";
     static final String PASS = "12345678";
-    // method which allows for the application to automatically obtain the correct new doctor id, even if the application is closed
-    private int getDoctorID() {
-        int nextId = 1;
-        String Query = "Select Max(doctor_id) from simplyhealthy.doctor";
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(Query)){
-            if (rs.next()) {
-                nextId = rs.getInt(1) + 1;
-            }
-        }catch(SQLException ex){
-            ex.printStackTrace();
+    // method which allows for the application to automatically obtain the correct new doctor id after creating a new doctor
+    //even if the application is closed
 
-        }
-        return nextId;
-    }
-    // method which allows for the application to automatically obtain the correct new patient id, even when the application is closed
-    private int getPatientID(){
-        int nextId = 1;
-        String Query = "Select Max(patient_id) from simplyhealthy.patient";
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(Query)){
-        if (rs.next()) {
-            nextId = rs.getInt(1) + 1;
-        }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-
-    }
-        return nextId;
-    }
-    private int getNurseID(){
-        int nextId = 1;
-        String Query = "Select Max(nurse_id) from simplyhealthy.nurse";
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(Query)){
-            if (rs.next()) {
-                nextId = rs.getInt(1) + 1;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-
-        }
-        return nextId;
-    }
-    private int getMedicineID(){
-        int nextId = 1;
-        String Query = "Select Max(medicine_id) from simplyhealthy.Medicine";
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(Query)){
-            if (rs.next()) {
-                nextId = rs.getInt(1) + 1;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-
-        }
-        return nextId;
-    }
-    private int getcheckInID(){
-        int nextId = 1;
-        String Query = "Select Max(CheckIn_id) from simplyhealthy.Checkin";
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(Query)){
-            if (rs.next()) {
-                nextId = rs.getInt(1) + 1;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-
-        }
-        return nextId;
-    }
-
-    private int getNurseSalaryID(){
-        int nextId = 1;
-        String Query = "Select Max(nurseSalary_id) from simplyhealthy.nurse_salaryHistory";
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(Query)){
-            if (rs.next()) {
-                nextId = rs.getInt(1) + 1;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-
-        }
-        return nextId;
-    }
-
-    private int getDoctorSalaryID(){
-        int nextId = 1;
-        String Query = "Select Max(doctorSalary_id) from simplyhealthy.doctor_salaryHistory";
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(Query)){
-            if (rs.next()) {
-                nextId = rs.getInt(1) + 1;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-
-        }
-        return nextId;
-    }
-    private int getOrderID(){
-        int nextId = 1;
-        String Query = "Select Max(order_id) from simplyhealthy.order";
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(Query)){
-            if (rs.next()) {
-                nextId = rs.getInt(1) + 1;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-
-        }
-        return nextId;
-    }
 
     @Override
     public void start(Stage primaryStage)  {
+        // Initilization of both add nurse Toggle Buttons
+
+        // set the time to automatically be am if the User does not hit either button
+        final String[] timeCheck = {" AM"};
+        final String[] timeCheck1 = {" AM"};
+        // put the toggle buttons in each respective Toggle Group
+        toggleAM.setToggleGroup(timeGroup);
+        toggleAM1.setToggleGroup(timeGroup1);
+        togglePM.setToggleGroup(timeGroup);
+        togglePM1.setToggleGroup(timeGroup1);
+
+        // highlights the AM toggle buttons first
+        toggleAM.setSelected(true);
+        toggleAM1.setSelected(true);
+
+        // used for when the User swaps between toggle buttons
+        timeGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            if (newToggle != null) {
+                if (newToggle == toggleAM){
+                    timeCheck[0] = " AM";
+                }
+                else if (newToggle == togglePM){
+                    timeCheck[0] = " PM";
+                }
+            }
+        });
+        timeGroup1.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            if (newToggle != null) {
+                if (newToggle == toggleAM1){
+                    timeCheck1[0] = " AM";
+                }
+                else if (newToggle == togglePM1){
+                    timeCheck1[0] = " PM";
+                }
+            }
+        });
+        // Initilization for the check in toggle Group
+        final String[] checkInTimeCheck = {" AM"};
+        toggleAM2.setToggleGroup(timeGroup2);
+        togglePM2.setToggleGroup(timeGroup2);
+        toggleAM2.setSelected(true);
+
+        timeGroup2.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            if (newToggle != null) {
+                if (newToggle == toggleAM2){
+                    checkInTimeCheck[0] = " AM";
+                }
+                else if (newToggle == togglePM2){
+                    checkInTimeCheck[0] = " PM";
+                }
+            }
+        });
+        // Initilization for the update nurse Start shift Toggle Group
+        final String[] TimeCheck3  = {" AM"};
+        toggleAM3.setToggleGroup(timeGroup3);
+        togglePM3.setToggleGroup(timeGroup3);
+        toggleAM3.setSelected(true);
+
+        timeGroup3.selectedToggleProperty().addListener((obs,oldToggle,newToggle)->{
+            if (newToggle != null) {
+                if (newToggle == toggleAM3){
+                    TimeCheck3[0] = " AM";
+                }
+                else if (newToggle == togglePM3){
+                    TimeCheck3[0] = " PM";
+                }
+            }
+        });
+        // Initilization for the nurse shift end Toggle Group
+        final String[] timeCheck4 = {" AM"};
+        toggleAM4.setToggleGroup(timeGroup4);
+        togglePM4.setToggleGroup(timeGroup4);
+        toggleAM4.setSelected(true);
+
+        timeGroup4.selectedToggleProperty().addListener((obs,oldToggle,newToggle)->{
+            if (newToggle != null) {
+                if (newToggle == toggleAM4){
+                    timeCheck4[0] = " AM";
+                }
+                else if (newToggle == togglePM4){
+                    timeCheck4[0] = " PM";
+                }
+            }
+        });
+
+        // Initilization for the update Check In Time Toggle Group
+        final String[] updateCheckInTimeCheck = { "AM"};
+        toggleAM5.setToggleGroup(timeGroup5);
+        toggleAM5.setToggleGroup(timeGroup5);
+        toggleAM5.setSelected(true);
+        timeGroup5.selectedToggleProperty().addListener((obs,oldToggle,newToggle)->{
+            if(newToggle != null){
+                if (newToggle == toggleAM5){
+                    updateCheckInTimeCheck[0] = " AM";
+                }
+                else if(newToggle == togglePM5){
+                    updateCheckInTimeCheck[0] = " PM";
+                }
+            }
+
+    });
+
+
 
         /**
         All of the necessary user-friendly buttons throughout the application
@@ -171,6 +283,7 @@ public class Try extends Application {
         Button deleteNurseSalary = new Button ("Remove Nurse Salary History");
         Button deleteOrder = new Button ("Remove Order");
         Button deleteCheckin = new Button("Remove Check-in");
+
         // all of the necessary update buttons in the application
         Button updateNurse = new Button("Update Nurse");
         Button updateDoctor = new Button("Update Doctor");
@@ -180,8 +293,8 @@ public class Try extends Application {
         Button updateNurseSalary = new Button("Update Nurse Salary");
         Button updateOrder = new Button("Update Order");
         Button updateCheckIn = new Button("Update CHeck-In");
-        // all of the "get buttons in this application
 
+        // all of the "get buttons in this application (last tab)
         Button getDoctors = new Button("Search Doctors");
         Button getNurses = new Button("Search Nurses");
         Button getPatients = new Button("Search Patients");
@@ -201,72 +314,42 @@ public class Try extends Application {
         MyText title7 = new MyText("Simply Healthy Page Eight");
 
         // Text used on the first page to add the doctors
-        MyText docFName = new MyText("Doctor First Name (Cannot be null)",15);
-        MyText docLname = new MyText("Doctor Last Name (Cannot be null)",15);
-        MyText docPhone = new MyText("Doctor Phone (Cannot be null)", 15);
-        MyText docYOE = new MyText("Doctor Years of Experience (cannot be null)",15);
-        MyText docEdu = new MyText("Doctor Highest Education (cannot be null)",15);
-        MyText docSpecialization = new MyText("Doctor Specialization (cannot be null)",15);
-        // Texfields wihch allow for user-friendly input on the first page
-        TextField fNameText = new TextField();
-        fNameText.setPromptText("Use letters only");
-        TextField lNameText = new TextField();
-        lNameText.setPromptText("Use letters only");
-        TextField docPhoneText = new TextField();
-        docPhoneText.setPromptText("Use numbers only");
-        TextField docPhoneText1 = new TextField();
-        docPhoneText1.setPromptText("Use numbers only");
-        TextField docPhoneText2 = new TextField();
-        docPhoneText2.setPromptText("Use numbers only");
-        TextField docYOEText = new TextField();
-        docYOEText.setPromptText("Use numbers only");
-        TextField docEduText = new TextField();
-        docEduText.setPromptText("Use letters only");
-        TextField docSpecializationText = new TextField();
-        docSpecializationText.setPromptText("Use letters only");
-        TextField deletePatientText = new TextField();
-        deletePatientText.setPromptText("Use numbers only");
+        MyText docFName = new MyText("Doctor First Name "+stringShorter.notNull(),15);
+        MyText docLname = new MyText("Doctor Last Name "+stringShorter.notNull(),15);
+        MyText docPhone = new MyText("Doctor Phone "+stringShorter.notNull(), 15);
+        MyText docYOE = new MyText("Doctor Years of Experience "+stringShorter.notNull(),15);
+        MyText docEdu = new MyText("Doctor Highest Education "+stringShorter.notNull(),15);
+        MyText docSpecialization = new MyText("Doctor Specialization "+stringShorter.notNull(),15);
 
-        MyText nurseFname = new MyText("Nurse First Name (cannot be null)",15);
-        TextField nurseFnameText = new TextField();
-        MyText nurseLname = new MyText("Nurse Last Name (cannot be null)",15);
-        TextField nurseLnameText = new TextField();
-        MyText shiftStart = new MyText("Nurse primary Shift Start Time (cannot be null)",15);
-        TextField nurseShiftStartText = new TextField();
-        TextField nurseShiftStartText1 = new TextField();
-        MyText nurseShiftEnd = new MyText("Nurse Primary End Time (cannot be null)",15);
-        TextField nurseShiftEndText = new TextField();
-        TextField nurseShiftEndText1 = new TextField();
-        MyText nursePhone = new MyText("Nurse Phone Number (cannot be null)",15);
-        TextField nursePhoneText = new TextField();
-        TextField nursePhoneText1 = new TextField();
-        TextField nursePhoneText2 = new TextField();
-        MyText nurseDoctor = new MyText("Nurse Primary doctor ID (cannot be null)", 15);
-        TextField nurseDoctorText = new TextField();
+        // Texfields wihch allow for user-friendly input on the first page
+        setPrompts();
+
+
+
+        MyText nurseFname = new MyText("Nurse First Name "+stringShorter.notNull(),15);
+
+        MyText nurseLname = new MyText("Nurse Last Name "+stringShorter.notNull(),15);
+
+        MyText shiftStart = new MyText("Nurse primary Shift Start Time "+stringShorter.notNull(),15);
+
+        MyText nurseShiftEnd = new MyText("Nurse Primary End Time "+stringShorter.notNull(),15);
+
+        MyText nursePhone = new MyText("Nurse Phone Number "+stringShorter.notNull(),15);
+
+        MyText nurseDoctor = new MyText("Nurse Primary doctor ID "+stringShorter.notNull(), 15);
+
 
         MyText docID = new MyText("Doctor ID",15);
         TextField docIDText = new TextField();
         MyText patID = new MyText("Patient ID",15);
 
-
-
-        MyText patFName = new MyText("Patient First Name (cannot be null)",15);
-        MyText patLName = new MyText("Patient Last Name (cannot be null)",15);
-        MyText patPhone = new MyText("Patient Phone Number (cannot be null)",15);
+        MyText patFName = new MyText("Patient First Name "+stringShorter.notNull(),15);
+        MyText patLName = new MyText("Patient Last Name "+stringShorter.notNull(),15);
+        MyText patPhone = new MyText("Patient Phone Number "+stringShorter.notNull(),15);
         MyText patGender = new MyText("Patient Gender",15);
 
-        TextField patFnameText = new TextField();
-        patFnameText.setPromptText("Use letters only");
-        TextField patLnameText = new TextField();
-        patLnameText.setPromptText("Use letters only");
-        TextField patPhoneText = new TextField();
-        patPhoneText.setPromptText("Use numbers only");
-        TextField patPhoneText1 = new TextField();
-        patPhoneText1.setPromptText("Use numbers only");
-        TextField patPhoneText2 = new TextField();
-        patPhoneText2.setPromptText("Use numbers only");
-        TextField patGenderText = new TextField();
-        patGenderText.setPromptText("Use letters only");
+
+
         final int[] count = {getDoctorID()};
         final  int[] count1 = {getPatientID()};
         final int[] count2 = {getNurseID()};
@@ -276,82 +359,55 @@ public class Try extends Application {
         final int[] count6 = {getcheckInID()};
         final int[] count7 = {getOrderID()};
 
+        MyText docDocSalaryId = new MyText("Doctor ID "+stringShorter.notNull(),15);
 
 
-        MyText docDocSalaryId = new MyText("Doctor ID (Cannot be null)",15);
-        TextField docDocSalaryIdText = new TextField();
-        docDocSalaryIdText.setPromptText("Use numbers only");
-        MyText docSalaryStart = new MyText("Doctor Salary Start Date (Cannot be null)",15);
-       TextField docSalaryStartText = new TextField();
-       docSalaryStartText.setPromptText("YYYY");
-       TextField docSalaryStartText1 = new TextField();
-       docSalaryStartText1.setPromptText("MM");
-        TextField docSalaryStartText2 = new TextField();
-        docSalaryStartText2.setPromptText("DD");
-        MyText docSalaryEnd = new MyText("Doctor Salary End Date (Cannot be null)",15);
-       TextField docSalaryEndText = new TextField();
-       docSalaryEndText.setPromptText("YYYY");
-       TextField docSalaryEndText1 = new TextField();
-       docSalaryEndText1.setPromptText("MM");
-       TextField docSalaryEndText2 = new TextField();
-       docSalaryEndText2.setPromptText("DD");
-        MyText docSalaryAmount = new MyText("Doctor Salary Amount (Cannot be null)",15);
-        TextField docSalaryAmountText = new TextField();
-        docSalaryAmountText.setPromptText("Use numbers only");
+        MyText docSalaryStart = new MyText("Doctor Salary Start Date "+stringShorter.notNull(),15);
 
-        MyText medicineName = new MyText("Medicine Name (Cannot be null)",15);
-        TextField medicineNameText = new TextField();
-        MyText medicineDescription = new MyText("Medicine Description (Cannot be null)",15);
-        TextField medicineDescriptionText = new TextField();
-        MyText medicineTreatment = new MyText("Medicine Treatment(s) (Cannot be null)",15);
-        TextField medicineTreatmentText = new TextField();
+
+        MyText docSalaryEnd = new MyText("Doctor Salary End Date "+stringShorter.notNull(),15);
+
+
+        MyText docSalaryAmount = new MyText("Doctor Salary Amount "+stringShorter.notNull(),15);
+
+
+
+        MyText medicineName = new MyText("Medicine Name "+stringShorter.notNull(),15);
+        MyText medicineDescription = new MyText("Medicine Description "+stringShorter.notNull(),15);
+        MyText medicineTreatment = new MyText("Medicine Treatment(s) "+stringShorter.notNull(),15);
+
 
 
         MyText checkInDoc = new MyText("Doctor ID",15);
-        TextField checkInDocText = new TextField();
+
         MyText checkInPat = new MyText("Patient ID",15);
-        TextField checkInPatText = new TextField();
-        MyText checkInTime = new MyText("Check in Time",15);
-        TextField checkInTimeText = new TextField();
-        TextField checkInTImeText1 = new TextField();
-        MyText checkInDate = new MyText("Check in Date",15);
-        TextField checkInDateText = new TextField();
-        TextField checkInDateText1 = new TextField();
-        TextField checkInDateText2 = new TextField();
-        MyText nurSalaryHistory = new MyText("Nurse ID",15);
-        TextField nurSalaryHistoryText = new TextField();
-        MyText nurSalaryStart = new MyText("Nurse Salary Start",15);
-        TextField nurSalaryStartText = new TextField();
-        nurSalaryStartText.setPromptText("YYYY");
-        TextField nurSalaryStartText1 = new TextField();
-        nurSalaryStartText1.setPromptText("MM");
-        TextField nurSalaryStartText2 = new TextField();
-        nurSalaryStartText2.setPromptText("DD");
-        MyText nurSalaryEnd = new MyText("Nurse Salary End",15);
-        TextField nurseSalaryEndText = new TextField();
-        nurseSalaryEndText.setPromptText("YYYY");
-        TextField nurseSalaryEndText1 = new TextField();
-        nurseSalaryEndText1.setPromptText("MM");
-        TextField nurseSalaryEndText2 = new TextField();
-        nurseSalaryEndText2.setPromptText("DD");
+
+        MyText checkInTime = new MyText("Check in Time "+stringShorter.notNull(),15);
+
+        MyText checkInDate = new MyText("Check in Date "+stringShorter.notNull(),15);
+
+        MyText nurSalaryHistory = new MyText("Nurse ID "+stringShorter.notNull(),15);
+
+        MyText nurSalaryStart = new MyText("Nurse Salary Start "+stringShorter.notNull(),15);
+
+
+        MyText nurSalaryEnd = new MyText("Nurse Salary End "+stringShorter.notNull(),15);
+
+
         MyText nurSalaryAmount = new MyText("Nurse Salary Amount",15);
-        TextField nurSalaryAmountText = new TextField();
-
-        MyText orderMedicineID = new MyText("Medicine ID",15);
-        TextField orderMedicineIDText = new TextField();
-        MyText orderPatientID = new MyText("Patient ID",15);
-        TextField orderPatientIDText = new TextField();
-        MyText orderAmount = new MyText("Order Quantity",15);
-        TextField orderAmountText = new TextField();
 
 
-        MyText statusMessage = new MyText("", 15);
-        MyText displayMessage = new MyText("",15);
-        MyText showMessage = new MyText("",15);
-        MyText showNurseMessage = new MyText("",15);
-        MyText showMedicineMessage = new MyText("",15);
-        MyText showDoctorSalaryMessage = new MyText("",15);
-        MyText showNurseSalaryMessage = new MyText("",15);
+        MyText orderMedicineID = new MyText("Medicine ID "+stringShorter.notNull(),15);
+        MyText orderPatientID = new MyText("Patient ID "+stringShorter.notNull(),15);
+        MyText orderAmount = new MyText("Order Quantity "+stringShorter.notNull(),15);
+
+        // This will show up when we have sucessfully added something to our database
+        MyText addPatientMessage = new MyText("",15);
+        MyText addDoctorMessage = new MyText("",15);
+        MyText addNurseMessage = new MyText("",15);
+        MyText addMedicineMessage = new MyText("",15);
+        MyText addDoctorSalaryMessage = new MyText("",15);
+        MyText addNurseSalaryMessage = new MyText("",15);
         MyText addCheckInMessage = new MyText("",15);
         MyText addOrderMessage = new MyText("",15);
 
@@ -393,7 +449,7 @@ public class Try extends Application {
         MyText updateDocHighestEDU = new MyText("Update Doctor Highest Education",15);
         TextField updateDocHighestEDUTEXT = new TextField();
 
-        MyText updatePatientId = new MyText("Id of the Patient Which needs to be Updated",15);
+        MyText updatePatientId = new MyText("ID of the Patient Which needs to be Updated",15);
         TextField updatePatientIdText = new TextField();
         MyText updatePatientFname =new MyText("Update Patient First Name (Leave Blank if you do not want to Change)",15);
         TextField updatePatientFnameText = new TextField();
@@ -420,27 +476,33 @@ public class Try extends Application {
         TextField updateNurseEndText1 = new TextField();
         MyText updateNursePhone = new MyText("Update Nurse Phone Number",15);
         TextField updateNursePhoneText = new TextField();
+        TextField updateNursePhoneText1 = new TextField();
+        TextField updateNursePhoneText2 = new TextField();
         MyText updateNurseDocId = new MyText("Update Nurse Primary Doctor",15);
         TextField updateNurseDocIdText = new TextField();
         
-        MyText updateDocSalaryID = new MyText("Id of the Doctor Salary History that needs to be updated",15);
-        TextField updateDocSalaryIDText = new TextField();
-        MyText updateDocSalaryDocID = new MyText("Update Doctor ID of Doctor Salary",15) ;
-        TextField updateDocSalaryDocIDText = new TextField();
-        MyText updateDocSalaryStart = new MyText("Update Start Date of Doctor Salary",15) ;
-        TextField updateDocSalaryStartText = new TextField();
-        MyText updateDocSalaryEnd = new MyText("Update End Date of Doctor Salary",15) ;
-        TextField updateDocSalaryEndText = new TextField();
-        MyText updateDocSalaryAmount = new MyText("Update Doctor Salary Amount",15);
-        TextField updateDocSalaryAmountText = new TextField();
+        MyText updateDoctorSalaryID = new MyText("Id of the Doctor Salary History that needs to be updated",15);
+        TextField updateDoctorSalaryIDText = new TextField();
+        MyText updateDoctorSalaryDocID = new MyText("Update Doctor ID of Doctor Salary",15) ;
+        TextField updateDoctorSalaryDocIDText = new TextField();
+        MyText updateDoctorSalaryStart = new MyText("Update Start Date of Doctor Salary",15) ;
+        TextField updateDoctorSalaryStartText = new TextField();
+        TextField updateDoctorSalaryStartText1 = new TextField();
+        TextField updateDoctorSalaryStartText2 = new TextField();
+        MyText updateDoctorSalaryEnd = new MyText("Update End Date of Doctor Salary",15) ;
+        TextField updateDoctorSalaryEndText = new TextField();
+        TextField updateDoctorSalaryEndText1 = new TextField();
+        TextField updateDoctorSalaryEndText2 = new TextField();
+        MyText updateDoctorSalaryAmount = new MyText("Update Doctor Salary Amount",15);
+        TextField updateDoctorSalaryAmountText = new TextField();
 
-        MyText updateMedicineID = new MyText("Id of the Medicine that needs to be updated") ;
+        MyText updateMedicineID = new MyText("Id of the Medicine that needs to be updated",15) ;
         TextField updateMedicineIDText = new TextField();
-        MyText updateMedicineName = new MyText("Update Medicine Name");
+        MyText updateMedicineName = new MyText("Update Medicine Name",15);
         TextField updateMedicineNameText = new TextField();
-        MyText updateMedicineDesc = new MyText("Update Medicine Description");
+        MyText updateMedicineDesc = new MyText("Update Medicine Description",15);
         TextField updateMedicineDescText = new TextField();
-        MyText updateMedicineTreatment = new MyText("Update Medicine Treatment");
+        MyText updateMedicineTreatment = new MyText("Update Medicine Treatment",15);
         TextField updateMedicineTreatmentText = new TextField();
 
          MyText updateNurseSalaryID = new MyText("Id of the Nurse Salary History that needs to be updated",15);
@@ -449,10 +511,14 @@ public class Try extends Application {
          TextField updateNurseSalaryDocIDText = new TextField();
          MyText updateNurseSalaryStart = new MyText("Update Start Date of Nurse Salary",15) ;
          TextField updateNurseSalaryStartText = new TextField();
+        TextField updateNurseSalaryStartText1 = new TextField();
+        TextField updateNurseSalaryStartText2 = new TextField();
          MyText updateNurseSalaryEnd = new MyText("Update End Date of Nurse Salary",15) ;
          TextField updateNurseSalaryEndText = new TextField();
+        TextField updateNurseSalaryEndText1 = new TextField();
+        TextField updateNurseSalaryEndText2 = new TextField();
          MyText updateNurseSalaryAmount = new MyText("Update Nurse Salary Amount",15);
-
+        TextField updateNurseSalaryAmountText = new TextField();
          MyText updateOrderID = new MyText("The Id of the Order that needs to be Updated",15);
          TextField updateOrderIDText = new TextField();
          MyText updateOrderPatientID = new MyText("Update Patient ID for the Order",15);
@@ -470,13 +536,16 @@ public class Try extends Application {
          TextField updateCheckInPatIDText = new TextField();
          MyText updateCheckInTime = new MyText("Update Check in time",15);
          TextField updateCheckInTimeText = new TextField();
+        TextField updateCheckInTimeText1 = new TextField();
          MyText updateCheckInDate = new MyText("Update Check in Date",15);
          TextField updateCheckInDateText = new TextField();
+        TextField updateCheckInDateText1 = new TextField();
+        TextField updateCheckInDateText2 = new TextField();
 
          
 
          addDoctor.setOnAction(e -> {
-         TextField updateNurseSalaryAmountText = new TextField();
+
 
          // Retrieve the values from the text fields
 
@@ -502,15 +571,24 @@ public class Try extends Application {
                 count[0]++;
 
 
-                try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                    try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                      Statement stmt = conn.createStatement()) {
                     stmt.executeUpdate(INSERT_QUERY);
 
-                    showMessage.setText("New Doctor has been added with the id: " + oneLess);
-                    showMessage.setVisible(true);
+                    addDoctorMessage.setText("New doctor has been added with the id: " + oneLess);
+                    addDoctorMessage.setVisible(true);
                     PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                    pauseTime.setOnFinished(event -> showMessage.setVisible(false));
+                    pauseTime.setOnFinished(event -> addDoctorMessage.setVisible(false));
                     pauseTime.play();
+
+                    fNameText.setText(null);
+                    lNameText.setText(null);
+                    docPhoneText.setText(null);
+                    docPhoneText1.setText(null);
+                    docPhoneText2.setText(null);
+                    docYOEText.setText(null);
+                    docEduText.setText(null);
+                    docSpecializationText.setText(null);
 
                 } catch (SQLException ex) {
 
@@ -519,12 +597,13 @@ public class Try extends Application {
                 }
             }
                 else {
-                    showMessage.setText("An error has occurred and a new doctor has not been added");
-                    showMessage.setVisible(true);
+                    addDoctorMessage.setText("An error has occurred and a new doctor has not been added");
+                    addDoctorMessage.setVisible(true);
                     PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                    pauseTime.setOnFinished(event -> showMessage.setVisible(false));
+                    pauseTime.setOnFinished(event -> addDoctorMessage.setVisible(false));
                     pauseTime.play();
                 }
+
         });
 
         addPatient.setOnAction(e->{
@@ -533,21 +612,28 @@ public class Try extends Application {
             String patientPhone = patPhoneText.getText();
             String patientPhone1 = patPhoneText1.getText();
             String patientPhone2 = patPhoneText2.getText();
+            String patientPhoneFull = patientPhone+ "-" + patientPhone1 + "-" + patientPhone2;
             String patientGender = patGenderText.getText();
 
             String Insert_Query = "Insert Into simplyhealthy.patient"+
                     "(patient_id,patient_fname,patient_lname,patient_phone,patient_gender)"+
-                    "values("+count1[0]+",'"+patientFname+"','"+patientLname+"','"+patientPhone+"','"+patientGender+"')";
+                    "values("+count1[0]+",'"+patientFname+"','"+patientLname+"','"+patientPhoneFull+"','"+patientGender+"')";
             count1[0]++;
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate(Insert_Query);
-                displayMessage.setText("New Patient has been added with the id: "+ Arrays.toString(count1));
-                displayMessage.setVisible(true);
+                addPatientMessage.setText("New patient has been added with the id: "+ Arrays.toString(count1));
+                addPatientMessage.setVisible(true);
                 PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                pauseTime.setOnFinished(event -> displayMessage.setVisible(false));
+                pauseTime.setOnFinished(event -> addPatientMessage.setVisible(false));
                 pauseTime.play();
 
+                patFnameText.setText(null);
+                patLnameText.setText(null);
+                patPhoneText.setText(null);
+                patPhoneText1.setText(null);
+                patPhoneText2.setText(null);
+                patGenderText.setText(null);
 
             } catch (SQLException ex) {
 
@@ -556,14 +642,15 @@ public class Try extends Application {
             }
         });
         addNurse.setOnAction(e->{
+
             String nurseFirstName = nurseFnameText.getText();
             String nurseLastName = nurseLnameText.getText();
             String nurseShiftStart = nurseShiftStartText.getText();
             String nurseShiftStart1 = nurseShiftStartText1.getText();
-            String addedNurseShiftStart = nurseShiftStart + ":"+nurseShiftStart1;
+            String addedNurseShiftStart = nurseShiftStart + ":"+nurseShiftStart1+timeCheck[0];
             String nurseShiftEnding = nurseShiftEndText.getText();
             String nurseShiftEnding1 = nurseShiftEndText1.getText();
-            String addedNurseShiftEnd = nurseShiftEnding + ":" +nurseShiftEnding1;
+            String addedNurseShiftEnd = nurseShiftEnding + ":" +nurseShiftEnding1+timeCheck1[0];
             String addNursePhone = nursePhoneText.getText()+ "-" + nursePhoneText1.getText() +"-"+ nursePhoneText2.getText();
             String doctorNurseId = nurseDoctorText.getText();
             String INSERT_QUERY = "INSERT INTO simplyhealthy.nurse " +
@@ -573,11 +660,21 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate(INSERT_QUERY);
-                showNurseMessage.setText("New Nurse has been added with the id: "+ Arrays.toString(count2));
-                showNurseMessage.setVisible(true);
+                addNurseMessage.setText("New nurse has been added with the id: "+ Arrays.toString(count2));
+                addNurseMessage.setVisible(true);
                 PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                pauseTime.setOnFinished(event -> showNurseMessage.setVisible(false));
+                pauseTime.setOnFinished(event -> addNurseMessage.setVisible(false));
                 pauseTime.play();
+                nurseFnameText.setText(null);
+                nurseLnameText.setText(null);
+                nurseShiftStartText.setText(null);
+                nurseShiftStartText1.setText(null);
+                nurseShiftEndText.setText(null);
+                nurseShiftEndText1.setText(null);
+                nursePhoneText.setText(null);
+                nursePhoneText1.setText(null);
+                nursePhoneText2.setText(null);
+                nurseDoctorText.setText(null);
             } catch (SQLException ex) {
 
                 ex.printStackTrace();
@@ -597,11 +694,14 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate(Insert_Query);
-                showMedicineMessage.setText("New Nurse has been added with the id: "+ Arrays.toString(count3));
-                showMedicineMessage.setVisible(true);
+                addMedicineMessage.setText("New medicine has been added with the id: "+ Arrays.toString(count3));
+                addMedicineMessage.setVisible(true);
                 PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                pauseTime.setOnFinished(event -> showMedicineMessage.setVisible(false));
+                pauseTime.setOnFinished(event -> addMedicineMessage.setVisible(false));
                 pauseTime.play();
+                medicineNameText.setText(null);
+                medicineDescriptionText.setText(null);
+                medicineTreatmentText.setText(null);
             } catch (SQLException ex) {
 
                 ex.printStackTrace();
@@ -628,11 +728,19 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate(addNurseSal_Query);
-                showNurseSalaryMessage.setText("New Nurse Salary has been added with the id: "+ Arrays.toString(count5));
-                showNurseSalaryMessage.setVisible(true);
+                addNurseSalaryMessage.setText("New nurse salary has been added with the id: "+ Arrays.toString(count5));
+                addNurseSalaryMessage.setVisible(true);
                 PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                pauseTime.setOnFinished(event -> showNurseSalaryMessage.setVisible(false));
+                pauseTime.setOnFinished(event -> addNurseSalaryMessage.setVisible(false));
                 pauseTime.play();
+                nurSalaryHistoryText.setText(null);
+                nurSalaryStartText.setText(null);
+                nurSalaryStartText1.setText(null);
+                nurSalaryStartText2.setText(null);
+                nurseSalaryEndText.setText(null);
+                nurseSalaryEndText1.setText(null);
+                nurseSalaryEndText2.setText(null);
+                nurSalaryAmountText.setText(null);
             } catch (SQLException ex) {
 
                 ex.printStackTrace();
@@ -660,11 +768,19 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate(addDocSalary_Query);
-                showDoctorSalaryMessage.setText("New Nurse has been added with the id: "+ Arrays.toString(count4));
-                showDoctorSalaryMessage.setVisible(true);
+                addDoctorSalaryMessage.setText("New doctor salary has been added with the id: "+ Arrays.toString(count4));
+                addDoctorSalaryMessage.setVisible(true);
                 PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                pauseTime.setOnFinished(event -> showDoctorSalaryMessage.setVisible(false));
+                pauseTime.setOnFinished(event -> addDoctorSalaryMessage.setVisible(false));
                 pauseTime.play();
+                docDocSalaryIdText.setText(null);
+                docSalaryStartText.setText(null);
+                docSalaryStartText1.setText(null);
+                docSalaryStartText2.setText(null);
+                docSalaryEndText.setText(null);
+                docSalaryEndText1.setText(null);
+                docSalaryEndText2.setText(null);
+                docSalaryAmountText.setText(null);
             } catch (SQLException ex) {
 
                 ex.printStackTrace();
@@ -676,7 +792,7 @@ public class Try extends Application {
             Integer addCheckInPatientID = Integer.parseInt(checkInPatText.getText());
             String addCheckInTime = checkInTimeText.getText();
             String addCheckInTIme1 = checkInTImeText1.getText();
-            String addedUpCheckIn = addCheckInTime+":"+addCheckInTIme1;
+            String addedUpCheckIn = addCheckInTime+":"+addCheckInTIme1 + checkInTimeCheck[0];
             String addCheckInDate = checkInDateText.getText();
             String addCheckInDate1 = checkInDateText1.getText();
             String addCheckInDate2 = checkInDateText2.getText();
@@ -691,11 +807,18 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate(addDocSalary_Query);
-                addCheckInMessage.setText("New Nurse has been added with the id: "+ Arrays.toString(count6));
+                addCheckInMessage.setText("New check in has been added with the id: "+ Arrays.toString(count6));
                 addCheckInMessage.setVisible(true);
                 PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
                 pauseTime.setOnFinished(event -> addCheckInMessage.setVisible(false));
                 pauseTime.play();
+                checkInDocText.setText(null);
+                checkInPatText.setText(null);
+                checkInTimeText.setText(null);
+                checkInTImeText1.setText(null);
+                checkInDateText.setText(null);
+                checkInDateText1.setText(null);
+                checkInDateText2.setText(null);
             } catch (SQLException ex) {
 
                 ex.printStackTrace();
@@ -719,11 +842,14 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate(addDocSalary_Query);
-                addOrderMessage.setText("New Nurse has been added with the id: "+ Arrays.toString(count7));
+                addOrderMessage.setText("New order has been added with the id: "+ Arrays.toString(count7));
                 addOrderMessage.setVisible(true);
                 PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
                 pauseTime.setOnFinished(event -> addOrderMessage.setVisible(false));
                 pauseTime.play();
+                orderPatientIDText.setText(null);
+                orderMedicineIDText.setText(null);
+                orderAmountText.setText(null);
             } catch (SQLException ex) {
 
                 ex.printStackTrace();
@@ -740,17 +866,17 @@ public class Try extends Application {
                  Statement stmt = conn.createStatement()) {
                 int rowsAffected = stmt.executeUpdate(DELETE_QUERY);
                 if (rowsAffected > 0) {
-                    statusMessage.setText("Doctor with ID: " + doctorId+ " has successfully been deleted");
-                    statusMessage.setVisible(true);
+                    delDocMessage.setText("Doctor with ID: " + doctorId+ " has successfully been deleted");
+                    delDocMessage.setVisible(true);
                     PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                    pauseTime.setOnFinished(event -> statusMessage.setVisible(false));
-
+                    pauseTime.setOnFinished(event -> delDocMessage.setVisible(false));
                     pauseTime.play();
+                    docIDText.setText(null);
                 } else {
-                    statusMessage.setText("Doctor with ID: " + doctorId+ " does not exist");
-                    statusMessage.setVisible(true);
+                    delDocMessage.setText("Doctor with ID: " + doctorId+ " does not exist");
+                    delDocMessage.setVisible(true);
                     PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
-                    pauseTime.setOnFinished(event -> statusMessage.setVisible(false));
+                    pauseTime.setOnFinished(event -> delDocMessage.setVisible(false));
                     pauseTime.play();
                 }
             } catch (SQLException ex) {
@@ -771,6 +897,7 @@ public class Try extends Application {
                     pauseTime.setOnFinished(event -> delPatMessage.setVisible(false));
 
                     pauseTime.play();
+                    deletePatientText.setText(null);
                 } else {
                     delPatMessage.setText("Patient with ID: " + patientId+ " does not exist");
                     delPatMessage.setVisible(true);
@@ -797,6 +924,7 @@ public class Try extends Application {
                     pauseTime.setOnFinished(event -> delNurMessage.setVisible(false));
 
                     pauseTime.play();
+                    delNurseText.setText(null);
                 } else {
                     delNurMessage.setText("Nurse with ID: " + nurseID+ " does not exist");
                     delNurMessage.setVisible(true);
@@ -829,6 +957,7 @@ public class Try extends Application {
                     PauseTransition pauseTime = new PauseTransition(Duration.seconds(3));
                     pauseTime.setOnFinished(event -> delNurSalMessage.setVisible(false));
                     pauseTime.play();
+                    delNurSalaryText.setText(null);
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -849,6 +978,7 @@ public class Try extends Application {
                     pauseTime.setOnFinished(event -> delDocSalMessage.setVisible(false));
 
                     pauseTime.play();
+                    delDocSalaryText.setText(null);
                 } else {
                     delDocSalMessage.setText("Nurse Salary with ID: " + doctorSalaryID+ " does not exist");
                     delDocSalMessage.setVisible(true);
@@ -875,6 +1005,7 @@ public class Try extends Application {
                     pauseTime.setOnFinished(event -> delOrderMessage.setVisible(false));
 
                     pauseTime.play();
+                    delOrderText.setText(null);
                 } else {
                     delOrderMessage.setText("Order with ID: " + OrderID+ " does not exist");
                     delOrderMessage.setVisible(true);
@@ -900,6 +1031,7 @@ public class Try extends Application {
                     pauseTime.setOnFinished(event -> delCheckInMessage.setVisible(false));
 
                     pauseTime.play();
+                    delCheckInText.setText(null);
                 } else {
                     delCheckInMessage.setText("Check-In with ID: " + checkInID+ " does not exist");
                     delCheckInMessage.setVisible(true);
@@ -925,6 +1057,7 @@ public class Try extends Application {
                     pauseTime.setOnFinished(event -> delMedicineMessage.setVisible(false));
 
                     pauseTime.play();
+                    delMedicineText.setText(null);
                 } else {
                     delMedicineMessage.setText("Nurse Salary with ID: " + medicineID+ " does not exist");
                     delMedicineMessage.setVisible(true);
@@ -959,10 +1092,20 @@ public class Try extends Application {
                 int rowsAffected = stmt.executeUpdate(updateDocQuery);
                 if (rowsAffected > 0) {
                     System.out.println("Doctor with ID " + updateDoc + " updated successfully.");
+                    updateDocText.setText(null);
+                    updateDocFnameText.setText(null);
+                    updateDocLNameText.setText(null);
+                    updateDocPhoneText.setText(null);
+                    updateDocPhoneText1.setText(null);
+                    updateDocPhoneText2.setText(null);
+                    updateDocYOEText.setText(null);
+                    updateDocHighestEDUTEXT.setText(null);
                 } else {
                     System.out.println("No doctor found with ID " + updateDoc + ".");
                 }
-            } catch (SQLException ex) {
+            }
+
+            catch (SQLException ex) {
                 ex.printStackTrace();
             }
 
@@ -987,17 +1130,227 @@ public class Try extends Application {
                  Statement stmt = conn.createStatement()) {
                 int rowsAffected = stmt.executeUpdate(updatePatQuery);
                 if (rowsAffected > 0) {
-                    System.out.println("Doctor with ID " + updatedPatId + " updated successfully.");
+                    System.out.println("Patient with ID " + updatedPatId + " updated successfully.");
+                    updatePatientIdText.setText(null);
+                    updatePatientFnameText.setText(null);
+                    updatePatientLnameText.setText(null);
+                    updatePatientPhoneText.setText(null);
+                    updatePatientPhoneText1.setText(null);
+                    updatePatientPhoneText2.setText(null);
+                    updatePatientGenderText.setText(null);
+
                 } else {
-                    System.out.println("No doctor found with ID " + updatedPatId + ".");
+                    System.out.println("No Patient found with ID " + updatedPatId + ".");
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
   });
         updateNurse.setOnAction(e->{
-            Integer updateNurseId = Integer.parseInt(updateNurseIDText.getText());
+            Integer updatedNurId = Integer.parseInt(updateNurseIDText.getText());
+            String updateNurFname = updateNurseFnameText.getText();
+            String updateNurLname = updateNurselnameText.getText();
+            String updateNurStart = updateNurseStartText.getText();
+            String updateNurStart1 = updateNurseStartText1.getText();
+            String updateNurStartFUll = updateNurStart + ":"+ updateNurStart1 ;
+            String updateNurEnd = updateNurseEndText.getText();
+            String updateNurEnd1 = updateNurseEndText1.getText();
+            String updateNurEndFull = updateNurEnd + ":"+ updateNurEnd1 ;
+            String updateNurPhone = updateNursePhoneText.getText();
+            String updateNurPhone1 = updateNursePhoneText1.getText();
+            String updateNurPhone2 = updateNursePhoneText2.getText();
+            String updateNurPhoneFull = updateNurPhone+ "-"+updateNurPhone1+ "-" +updateNurPhone2;
 
+            String updateNurQuery = "update simplyHealthy.nurse set"+
+                    "nurse_Fname= '"+updateNurFname +"," +
+                    "nurse_Lname='"+updateNurLname +"," +
+                    "nurse_shiftstart= '"+updateNurStartFUll+"," +
+                    "nurse_shiftend= '"+updateNurEndFull+"," +
+                    "nurse_phone='"+updateNurPhoneFull+"," +
+                    "where nurse_id = " + updatedNurId;
+            try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                 Statement stmt = conn.createStatement()) {
+                int rowsAffected = stmt.executeUpdate(updateNurQuery);
+                if (rowsAffected > 0) {
+                    System.out.println("Nurse with ID " + updatedNurId + " updated successfully.");
+                    updateNurseIDText.setText(null);
+                    updateNurseFnameText.setText(null);
+                    updateNurselnameText.setText(null);
+                    updateNurseStartText.setText(null);
+                    updateNurseStartText1.setText(null);
+                    updateNurseEndText.setText(null);
+                    updateNurseEndText1.setText(null);
+                    updateNursePhoneText.setText(null);
+                    updateNursePhoneText1.setText(null);
+                    updateNursePhoneText2.setText(null);
+
+                } else {
+                    System.out.println("No Nurse found with ID " + updatedNurId + ".");
+                }
+
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+
+        });
+        updateDoctorSalary.setOnAction(e->{
+
+            Integer updatedDocSalary = Integer.parseInt(updateDoctorSalaryIDText.getText());
+            String updateDocSalaryDocID = updateDoctorSalaryDocID.getText();
+            String updateDocSalaryStart = updateDoctorSalaryStartText.getText();
+            String updateDocSalaryStart1  =updateDoctorSalaryStartText1.getText();
+            String updateDocSalaryStart2 = updateDoctorSalaryStartText2.getText();
+            String updateDocSalaryStartFull = updateDocSalaryStart + "-" + updateDocSalaryStart1 +"-"+ updateDocSalaryStart2;
+            String updateDocSalaryEnd = updateDoctorSalaryEndText.getText();
+            String updateDocSalaryEnd1 = updateDoctorSalaryEndText1.getText();
+            String updateDocSalaryEnd2 = updateDoctorSalaryEndText2.getText();
+            String updateDocSalaryEndFull = updateDocSalaryEnd  +"-"+updateDocSalaryEnd1+"-"+updateDocSalaryEnd2;
+            Integer updateDocSalaryAmount = Integer.parseInt(updateDoctorSalaryAmountText.getText());
+
+            String updateDocSalQuery = "update simplyHealthy.doctor_salaryHistory set"+
+                    "doctor_id= '"+updateDocSalaryDocID +"," +
+                    "doctorSalary_Start='"+updateDocSalaryStartFull+"," +
+                    "doctorSalary_End= '"+updateDocSalaryEndFull+"," +
+                    "doctorSalary_Amount= '"+updateDocSalaryAmount+"," +
+                    "where doctorSalary_id = " + updatedDocSalary;
+
+            try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                 Statement stmt = conn.createStatement()) {
+                int rowsAffected = stmt.executeUpdate(updateDocSalQuery);
+                if (rowsAffected > 0) {
+                    System.out.println("Nurse with ID " + updateDocSalQuery + " updated successfully.");
+                } else {
+                    System.out.println("No Nurse found with ID " + updateDocSalQuery + ".");
+                }
+
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+
+        });
+
+        updateNurseSalary.setOnAction(e->{
+
+            Integer updatedNurSalary = Integer.parseInt(updateNurseSalaryIDText.getText());
+            String updateNurSalaryDocID = updateNurseSalaryDocID.getText();
+            String updateNurSalaryStart = updateNurseSalaryStartText.getText();
+            String updateNurSalaryStart1  =updateNurseSalaryStartText1.getText();
+            String updateNurSalaryStart2 = updateNurseSalaryStartText2.getText();
+            String updateNurSalaryStartFull = updateNurSalaryStart + "-" + updateNurSalaryStart1 +"-"+ updateNurSalaryStart2;
+            String updateNurSalaryEnd = updateNurseSalaryEndText.getText();
+            String updateNurSalaryEnd1 = updateNurseSalaryEndText1.getText();
+            String updateNurSalaryEnd2 = updateNurseSalaryEndText2.getText();
+            String updateNurSalaryEndFull = updateNurSalaryEnd  +"-"+updateNurSalaryEnd1+"-"+updateNurSalaryEnd2;
+            Integer updateNurSalaryAmount = Integer.parseInt(updateNurseSalaryAmountText.getText());
+
+            String updateNurSalQuery = "update simplyHealthy.doctor_salaryHistory set"+
+                    "nurse_id= '"+updatedNurSalary +"," +
+                    "nurseSalary_Start='"+updateNurSalaryStartFull+"," +
+                    "nurseSalary_End= '"+updateNurSalaryEndFull+"," +
+                    "nurseSalary_Amount= '"+updateNurSalaryAmount+"," +
+                    "where nurseSalary_id = " + updatedNurSalary;
+
+            try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                 Statement stmt = conn.createStatement()) {
+                int rowsAffected = stmt.executeUpdate(updateNurSalQuery);
+                if (rowsAffected > 0) {
+                    System.out.println("Nurse with ID " + updateNurSalQuery + " updated successfully.");
+                } else {
+                    System.out.println("No Nurse found with ID " + updateNurSalQuery + ".");
+                }
+
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+
+        });
+
+        updateMedicine.setOnAction(e->{
+
+            Integer updatedMed = Integer.parseInt(updateMedicineIDText.getText());
+            String updateMedName = updateMedicineNameText.getText();
+            String updateMedDescription = updateMedicineDescText.getText();
+            String updateMedTreatment = updateMedicineTreatmentText.getText();
+
+            String updateMedQuery = "update simplyHealthy.medicine set"+
+                    "medicine_name='"+updateMedName+"," +
+                    "medicine_description= '"+updateMedDescription+"," +
+                    "medicine_Treatment= '"+updateMedTreatment+"," +
+                    "where medicine_id = " + updatedMed;
+
+            try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                 Statement stmt = conn.createStatement()) {
+                int rowsAffected = stmt.executeUpdate(updateMedQuery);
+                if (rowsAffected > 0) {
+                    System.out.println("Medicine with ID " + updateMedQuery + " updated successfully.");
+                } else {
+                    System.out.println("No Medicine found with ID " + updateMedQuery + ".");
+                }
+
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+
+        });
+        updateCheckIn.setOnAction(e->{
+
+            Integer updatedCheIn = Integer.parseInt(updateCheckInID.getText());
+            String updateCheInPatientID = updateCheckInPatIDText.getText();
+            String updateCheInTime = updateCheckInTimeText.getText();
+            String updateCheInTime1 = updateCheckInTimeText1.getText();
+            String updateCheInTimeFull = updateCheInTime + ":" + updateCheInTime1;
+            String updateCheInDate = updateCheckInDateText.getText();
+            String updateCheInDate1 = updateCheckInDateText1.getText();
+            String updateCheInDate2 = updateCheckInDateText2.getText();
+            String updateCheInDateFull = updateCheInDate+ "-"+ updateCheInDate1+ "-" + updateCheInDate2;
+
+
+            String updateCheckInQuery = "update simplyHealthy.checkIn set"+
+                    "doctor_id='"+updateCheInPatientID+"," +
+                    "patient_id= '"+updateCheInTime+"," +
+                    "checkIn_time= '"+updateCheInTimeFull+"," +
+                    "checkIn_date= '"+updateCheInDateFull+"," +
+                    "where checkIn_id = " + updatedCheIn;
+
+            try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                 Statement stmt = conn.createStatement()) {
+                int rowsAffected = stmt.executeUpdate(updateCheckInQuery);
+                if (rowsAffected > 0) {
+                    System.out.println("Check in with ID " + updatedCheIn + " updated successfully.");
+                } else {
+                    System.out.println("No check in found with ID " + updatedCheIn + ".");
+                }
+
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
+
+        });
+        updateOrder.setOnAction(e->{
+
+            Integer updatedOrder = Integer.parseInt(updateOrderIDText.getText());
+            String updateOrdPatientID = updateOrderPatientIDText.getText();
+            String updateOrdMedicineID = updateOrderMedicineIDText.getText();
+            String updateOrdQuantity = updateOrderQuantityText.getText();
+
+            String updateOrderQuery = "update simplyHealthy.order set"+
+                    "doctor_id='"+updateOrdPatientID+"," +
+                    "patient_id= '"+updateOrdMedicineID+"," +
+                    "order_quantity= '"+updateOrdQuantity+"," +
+                    "where order_id= " + updatedOrder;
+
+            try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                 Statement stmt = conn.createStatement()) {
+                int rowsAffected = stmt.executeUpdate(updateOrderQuery);
+                if (rowsAffected > 0) {
+                    System.out.println("Order with ID " + updatedOrder + " updated successfully.");
+                } else {
+                    System.out.println("No order found with ID " + updatedOrder + ".");
+                }
+
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
 
         });
 
@@ -1011,13 +1364,13 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement();) {
            ResultSet set = stmt.executeQuery(getQuery);
-           String textAreaText = "";
+                String textAreaText = "Patient Search:\n";
            while(set.next()){
-               textAreaText += "Patient ID" + set.getInt("patient_id")
-                       +"Patient First Name" + set.getString("patient_fname")
-                       +"Patient Last Name" + set.getString("patient_lname")
-                       +"Patient Phone"+ set.getString("patient_phone")
-                       +"Patient Gender"+ set.getString("patient_Gender")
+               textAreaText += "Patient ID " + set.getInt("patient_id")
+                       +" Patient First Name " + set.getString("patient_fname")
+                       +" Patient Last Name " + set.getString("patient_lname")
+                       +" Patient Phone "+ set.getString("patient_phone")
+                       +" Patient Gender "+ set.getString("patient_Gender")
                         + "\n";
            }
            textArea.setText(textAreaText);
@@ -1030,18 +1383,20 @@ public class Try extends Application {
 
         getDoctors.setOnAction(e->{
             String getQuery = "Select * from simplyhealthy.Doctor";
+
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement();) {
                 ResultSet set = stmt.executeQuery(getQuery);
-                String textAreaText = "";
+
+                String textAreaText = "Doctor Search:\n";
                 while(set.next()) {
-                    textAreaText += "Doctor ID" + set.getInt("doctor_id")
-                            + "Doctor First Name" + set.getString("doctor_fname")
-                            + "Doctor Last Name" + set.getString("doctor_lname")
-                            + "Doctor Phone" + set.getString("doctor_phone")
-                            + "Doctor Years of Experience" + set.getInt("doctor_YOE")
-                            + "Doctor Highest Education" + set.getString("doctor_highestEdu")
-                            + "Doctor Specialization" + set.getString("doctor_specialization")
+                    textAreaText += "Doctor ID " + set.getInt("doctor_id")
+                            + " Doctor First Name " + set.getString("doctor_fname")
+                            + " Doctor Last Name " + set.getString("doctor_lname")
+                            + " Doctor Phone " + set.getString("doctor_phone")
+                            + " Doctor Years of Experience " + set.getInt("doctor_YOE")
+                            + " Doctor Highest Education " + set.getString("doctor_highestEdu")
+                            + " Doctor Specialization " + set.getString("doctor_specialization")
                             + "\n";
                 }
                 textArea.setText(textAreaText);
@@ -1057,15 +1412,16 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement();) {
                 ResultSet set = stmt.executeQuery(getQuery);
-                String textAreaText = "";
+                String textAreaText = "Nurses Search:\n";
+
                 while(set.next()) {
-                    textAreaText += "Nurse ID" + set.getInt("nurse_id")
-                    + "First Name" + set.getString("nurse_fname")
-                    + "Last Name" +set.getString("nurse_lname")
-                    + "Primary Shift Start"+set.getString("nurse_shiftstart")
-                    + "Primary Shift End" + set.getString("nurse_shiftend")
-                    + "Phone Number" + set.getString("nurse_phone")
-                    + "Primary Doctor ID" + set.getInt("doctor_id")
+                    textAreaText += "Nurse ID " + set.getInt("nurse_id")
+                    + " First Name " + set.getString("nurse_fname")
+                    + " Last Name " +set.getString("nurse_lname")
+                    + " Primary Shift Start "+set.getString("nurse_shiftstart")
+                    + " Primary Shift End " + set.getString("nurse_shiftend")
+                    + " Phone Number " + set.getString("nurse_phone")
+                    + " Primary Doctor ID " + set.getInt("doctor_id")
                     + "\n";
                 }
                 textArea.setText(textAreaText);
@@ -1079,13 +1435,13 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement();) {
                 ResultSet set = stmt.executeQuery(getQuery);
-                String textAreaText = "";
+                String textAreaText = "Doctor Salaries Search:\n";
                 while(set.next()) {
-                    textAreaText += "Doctor Salary History ID" + set.getInt("doctorsalary_id")
-                            + "Doctor ID" + set.getString("doctor_id")
-                            + "Doctor Salary Start" +set.getString("doctorsalary_start")
-                            + "Doctor Salary End"+set.getString("doctorsalary_end")
-                            + "Doctor Salary Amount" + set.getString("doctorsalary_amount")
+                    textAreaText += "Doctor Salary History ID " + set.getInt("doctorsalary_id")
+                            + " Doctor ID " + set.getString("doctor_id")
+                            + " Doctor Salary Start " +set.getString("doctorsalary_start")
+                            + " Doctor Salary End "+set.getString("doctorsalary_end")
+                            + " Doctor Salary Amount " + set.getString("doctorsalary_amount")
                             + "\n";
                 }
                 textArea.setText(textAreaText);
@@ -1100,11 +1456,11 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement();) {
                 ResultSet set = stmt.executeQuery(getQuery);
-                String textAreaText = "";
+                String textAreaText = "Medicine Search:\n";
                 while(set.next()) {
-                    textAreaText += "Medicine ID" + set.getInt("medicine_id")
-                            + "Name" + set.getString("Medicine_id")
-                            + "Treatment" +set.getString("medicine_treatment")
+                    textAreaText += "Medicine ID " + set.getInt("medicine_id")
+                            + " Name " + set.getString("Medicine_id")
+                            + " Treatment " +set.getString("medicine_treatment")
                             + "\n";
                 }
                 textArea.setText(textAreaText);
@@ -1120,11 +1476,11 @@ public class Try extends Application {
                 ResultSet set = stmt.executeQuery(getQuery);
                 String textAreaText = "";
                 while(set.next()) {
-                    textAreaText += "Check-In ID" + set.getInt("CheckIn_id")
-                            + "Doctor ID" + set.getString("doctor_id")
-                            + "patient ID" +set.getString("patient_Id")
-                            + "Check-In Time"+set.getString("CheckIn_time")
-                            +"Check-In Date"+set.getString("CheckIn_Date")
+                    textAreaText += "Check-In ID " + set.getInt("CheckIn_id")
+                            + " Doctor ID " + set.getString("doctor_id")
+                            + " patient ID " +set.getString("patient_Id")
+                            + " Check-In Time "+set.getString("CheckIn_time")
+                            +" Check-In Date "+set.getString("CheckIn_Date")
                             + "\n";
                 }
                 textArea.setText(textAreaText);
@@ -1140,13 +1496,13 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement();) {
                 ResultSet set = stmt.executeQuery(getQuery);
-                String textAreaText = "";
+                String textAreaText = "Nurse Salary Search:\n";
                 while(set.next()) {
                     textAreaText += "" + set.getInt("nurseSalary_id")+
-                            " "+ set.getInt("nurse_id")+
-                            " " +set.getString("nurseSalary_start")+
-                            " " +set.getString("nurseSalary_end")+
-                            " " +set.getDouble("nurseSalary_amount")+
+                            "Nurse ID "+ set.getInt("nurse_id")+
+                            " Nurse Salary Start " +set.getString("nurseSalary_start")+
+                            " Nurse Salary End " +set.getString("nurseSalary_end")+
+                            " Nurse Salary Amount " +set.getDouble("nurseSalary_amount")+
                             "\n";
                 }
                 textArea.setText(textAreaText);
@@ -1160,11 +1516,11 @@ public class Try extends Application {
             try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
                  Statement stmt = conn.createStatement();) {
                 ResultSet set = stmt.executeQuery(getQuery);
-                String textAreaText = "";
+                String textAreaText = "Order Search:\n";
                 while(set.next()) {
-                    textAreaText += "Order ID" + set.getInt("order_id")
-                            + "Patient ID" + set.getString("patient_id")
-                            + "Medicine ID" +set.getString("medicine_Id")
+                    textAreaText += "Order ID " + set.getInt("order_id")
+                            + " Patient ID " + set.getString("patient_id")
+                            + " Medicine ID " +set.getString("medicine_Id")
 
                             + "\n";
                 }
@@ -1485,160 +1841,158 @@ public class Try extends Application {
         catch (SQLException e) {
             e.printStackTrace();
         }
-        Tab tab = new Tab("Tab");
-        Tab tab1 = new Tab("Tab 1");
-        Tab tab2 = new Tab("Tab 2");
-        Tab tab3 = new Tab("tab 3");
-        Tab tab4 = new Tab("tab 4");
-        Tab tab5 = new Tab("tab 5");
-        Tab tab6 = new Tab("tab 6");
-        Tab tab7 = new Tab("tab 7");
-        Tab tab8 = new Tab("tab 8");
-
-        BorderPane borderPane = new BorderPane();
-        BorderPane borderPane1 = new BorderPane();
-        BorderPane borderPane2 = new BorderPane();
-        BorderPane borderPane3 = new BorderPane();
-        BorderPane borderPane4 = new BorderPane();
-        BorderPane borderPane5 = new BorderPane();
-        BorderPane borderPane6 = new BorderPane();
-        BorderPane borderPane7 = new BorderPane();
-        BorderPane borderPane8 = new BorderPane();
-
-
-
-        tab2.setContent(borderPane2);
-        tab3.setContent(borderPane3);
-        tab4.setContent(borderPane4);
-        tab5.setContent(borderPane5);
-        tab6.setContent(borderPane6);
-        tab7.setContent(borderPane7);
-        tab8.setContent(borderPane8);
+        // declare all the tabs and borderpanes we need via array
+        Tab[]tabs = new Tab[9];
+        BorderPane []borderPanes = new BorderPane[9];
+        // initialize all the
+        for (int i = 0;i<9;i++){
+            tabs[i] = new Tab("Tab " + i);
+            borderPanes[i] = new BorderPane();
+            tabs[i].setContent(borderPanes[i]);
+        }
 
         TabPane tabPane = new TabPane();
-        tabPane.getTabs().addAll(tab,tab1,tab2,tab4,tab5,tab6,tab7,tab8,tab3);
+        tabPane.getTabs().addAll(tabs[0],tabs[1],tabs[2],tabs[4],tabs[5],tabs[6],tabs[7],tabs[8],tabs[3]);
         MyVBox myVBox = new MyVBox();
+        Region []regions = new Region[32];
+        for (int i = 0; i<32;i++){
+            regions[i] = new Region();
+            if (i>16){
+                regions[i].setMinHeight(20);
+            }
+            else {
+                regions[i].setMinHeight(5);
+            }
+        }
+        MyText []dashTexts = new MyText[35];
+        for(int i = 0; i<34;i++){
+            dashTexts[i] = new MyText("-");
+        }
 
-        Region spacer = new Region();
-        Region spacer1 = new Region();
-        Region spacer2 = new Region();
-        Region spacer3 = new Region();
-        Region spacer4 = new Region();
-        Region spacer5 = new Region();
-        Region spacer6 = new Region();
-        Region spacer7 = new Region();
-        Region spacer8 = new Region();
-        Region spacer9 = new Region();
-        Region spacer10 = new Region();
-        Region spacer11 = new Region();
-        Region spacer12 = new Region();
-        Region spacer13 = new Region();
-        Region spacer14 = new Region();
-        Region spacer15 = new Region();
-        Region spacer16 = new Region();
-        Region spacer17 = new Region();
-        Region spacer18 = new Region();
-        Region spacer19 = new Region();
-        Region spacer20 = new Region();
-        Region spacer21 = new Region();
-        Region spacer22 = new Region();
-        Region spacer23 = new Region();
-        Region spacer24 = new Region();
-        Region spacer25 = new Region();
-        Region spacer26 = new Region();
-        Region spacer27 = new Region();
-        Region spacer28 = new Region();
-        Region spacer29 = new Region();
-        Region spacer30 = new Region();
-        Region spacer31 = new Region();
-        spacer.setMinHeight(20);
-        spacer1.setMinHeight(20);
-        spacer2.setMinHeight(20);
-        spacer3.setMinHeight(5);
-        spacer4.setMinHeight(5);
-        spacer5.setMinHeight(5);
-        spacer6.setMinHeight(20);
-        spacer7.setMinHeight(5);
-        spacer8.setMinHeight(20);
-        spacer9.setMinHeight(5);
-        spacer10.setMinHeight(20);
-        spacer11.setMinHeight(20);
-        spacer12.setMinHeight(5);
-        spacer13.setMinHeight(5);
-        spacer14.setMinHeight(20);
-        spacer15.setMinHeight(5);
-        spacer16.setMinHeight(20);
-        spacer17.setMinHeight(5);
-        spacer18.setMinHeight(20);
-        spacer19.setMinHeight(5);
-        spacer20.setMinHeight(20);
-        spacer21.setMinHeight(5);
-        spacer22.setMinHeight(20);
-        spacer23.setMinHeight(5);
-        spacer24.setMinHeight(20);
-        spacer25.setMinHeight(5);
-        spacer26.setMinHeight(20);
-        spacer27.setMinHeight(5);
-        spacer28.setMinHeight(20);
-        spacer29.setMinHeight(5);
-        spacer30.setMinHeight(20);
-        spacer31.setMinHeight(5);
+
         MyGridPane gridPane = new MyGridPane();
         gridPane.setAlignment(Pos.CENTER);
-        MyText dashText = new MyText("-");
-        MyText dashText1 = new MyText("-");
-        gridPane.addphone(docPhoneText,dashText,docPhoneText1,dashText1,docPhoneText2);
 
-        MyText dashText2 = new MyText("-");
-        MyText dashText3 = new MyText("-");
+        gridPane.addphone(docPhoneText,dashTexts[0],docPhoneText1,dashTexts[1],docPhoneText2);
+
         MyGridPane gridPane1 = new MyGridPane();
-        gridPane1.addphone(patPhoneText,dashText2,patPhoneText1,dashText3,patPhoneText2);
+        gridPane1.addphone(patPhoneText,dashTexts[2],patPhoneText1,dashTexts[3],patPhoneText2);
         gridPane1.setAlignment(Pos.CENTER);
 
         MyGridPane updateDocphoneGridPane = new MyGridPane();
-        MyText dashText14= new MyText("-");
-        MyText dashText15= new MyText("-");
-        updateDocphoneGridPane.addphone(updateDocPhoneText,dashText14,updateDocPhoneText1,dashText15,updateDocPhoneText2);
+
+        updateDocphoneGridPane.addphone(updateDocPhoneText,dashTexts[4],updateDocPhoneText1,dashTexts[5],updateDocPhoneText2);
         updateDocphoneGridPane.setAlignment(Pos.CENTER);
-        myVBox.getChildren().addAll(title,spacer, docFName, fNameText, docLname, lNameText, docPhone,gridPane,docYOE,docYOEText,docEdu,docEduText,docSpecialization,docSpecializationText,spacer3, addDoctor,showMessage,spacer2,docID,docIDText,spacer4,deleteDoctor,statusMessage,updateDocID,updateDocText,updateDocFName,updateDocFnameText,updateDocLName,updateDocLNameText,updateDocPhone,updateDocphoneGridPane, updateDocYOE,updateDocYOEText,updateDocHighestEDU,updateDocHighestEDUTEXT,updateDoctor);
+        ImageView []imageView= new ImageView[8];
+        Image []image = new Image[8];
+        for (int i = 0;i<8;i++){
+            imageView[i] = new ImageView();
+             image[i] = new Image(getClass().getResourceAsStream("MedicalCross.png"));
+            imageView[i].setImage(image[i]);
+            imageView[i].setFitHeight(50);
+            imageView[i].setFitWidth(50);
+        }
+
+
+        //20,5,20,5
+        myVBox.getChildren().addAll(title,imageView[0],regions[0], docFName, fNameText, docLname, lNameText, docPhone,gridPane,docYOE,docYOEText,docEdu,docEduText,docSpecialization,docSpecializationText,regions[16], addDoctor,addDoctorMessage,regions[1],docID,docIDText,regions[17],deleteDoctor,delDocMessage,updateDocID,updateDocText,updateDocFName,updateDocFnameText,updateDocLName,updateDocLNameText,updateDocPhone,updateDocphoneGridPane, updateDocYOE,updateDocYOEText,updateDocHighestEDU,updateDocHighestEDUTEXT,updateDoctor);
         ScrollPane scrollPane = new ScrollPane(myVBox);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
 
-        MyText dashText4 = new MyText("-");
-        MyText dashText5 = new MyText("-");
-        MyGridPane gridPane2 = new MyGridPane();
 
-        gridPane2.addphone(nursePhoneText,dashText4,nursePhoneText1,dashText5,nursePhoneText2);
+        MyGridPane gridPane2 = new MyGridPane();
+        gridPane2.addphone(nursePhoneText,dashTexts[6],nursePhoneText1,dashTexts[7],nursePhoneText2);
         gridPane2.setAlignment(Pos.CENTER);
         MyVBox myPatientVbox = new MyVBox();
 
         MyGridPane patientPhoneGridPane = new MyGridPane();
-        MyText dashText16 = new MyText("-");
-        MyText dashText17 = new MyText("-");
-        patientPhoneGridPane.addphone(updatePatientPhoneText,dashText16,updatePatientPhoneText1,dashText17,updatePatientPhoneText2);
+        patientPhoneGridPane.addphone(updatePatientPhoneText,dashTexts[8],updatePatientPhoneText1,dashTexts[9],updatePatientPhoneText2);
         patientPhoneGridPane.setAlignment(Pos.CENTER);
-        myPatientVbox.getChildren().addAll(title1,spacer1,patFName,patFnameText,patLName,patLnameText,patPhone,gridPane1,patGender,patGenderText,spacer5,addPatient,displayMessage,spacer6,patID,deletePatientText,spacer7,deletePatient,delPatMessage,updatePatientId,updatePatientIdText,updatePatientFname,updatePatientFnameText,updatePatientLname,updatePatientLnameText,updatePatientPhone,patientPhoneGridPane,updatePatientGender,updatePatientGenderText,updatePatient);
+
+        MyGridPane updateNurseShiftStartGridPane = new MyGridPane();
+        MyText colonText3 = new MyText(":");
+       // updateNurseShiftStartGridPane.addTime(updateNurseStartText,colonText3,updateNurseStartText1);
+        updateNurseShiftStartGridPane.setAlignment(Pos.CENTER);
+
+        MyGridPane updateNurseShiftEndGridPane = new MyGridPane();
+        MyText colonText4 = new MyText(":");
+        //updateNurseShiftStartGridPane.addTime(updateNurseEndText,colonText4,updateNurseEndText1);
+        updateNurseShiftEndGridPane.setAlignment(Pos.CENTER);
+
+        MyGridPane updateNursePhoneGridPane = new MyGridPane();
+        updateNursePhoneGridPane.addphone(updateNursePhoneText,dashTexts[20],updateNursePhoneText1,dashTexts[21],updateNursePhoneText2);
+        updateNursePhoneGridPane.setAlignment(Pos.CENTER);
+
+        MyGridPane updateDoctorSalaryStartGridPane = new MyGridPane();
+        updateDoctorSalaryStartGridPane.addphone(updateDoctorSalaryStartText,dashTexts[22],updateDoctorSalaryStartText1,dashTexts[23],updateNurseSalaryStartText2);
+        updateDoctorSalaryStartGridPane.setAlignment(Pos.CENTER);
+
+        MyGridPane updateDoctorSalaryEndGridPane = new MyGridPane();
+        updateDoctorSalaryEndGridPane.addphone(updateDoctorSalaryEndText,dashTexts[24],updateDoctorSalaryEndText1,dashTexts[25],updateDoctorSalaryEndText2);
+        updateDoctorSalaryEndGridPane.setAlignment(Pos.CENTER);
+
+        MyGridPane updateNurseSalaryStartGridPane = new MyGridPane();
+        updateNurseSalaryStartGridPane.addphone(updateNurseSalaryStartText,dashTexts[26],updateNurseSalaryStartText1,dashTexts[27],updateNurseSalaryStartText2);
+        updateNurseSalaryStartGridPane.setAlignment(Pos.CENTER);
+
+        MyGridPane updateNurseSalaryEndGridPane = new MyGridPane();
+        updateNurseSalaryEndGridPane.addphone(updateNurseSalaryEndText,dashTexts[28],updateNurseSalaryEndText1,dashTexts[29],updateNurseSalaryEndText2);
+        updateNurseSalaryEndGridPane.setAlignment(Pos.CENTER);
+
+        MyGridPane updateCheckInTimeGridPane = new MyGridPane();
+        MyText colonText5 = new MyText(":");
+        //updateCheckInTimeGridPane.addTime(updateCheckInTimeText,colonText5,updateCheckInTimeText1);
+        updateCheckInTimeGridPane.setAlignment(Pos.CENTER);
+
+        MyGridPane updateCheckInDateGridPane = new MyGridPane();
+        updateCheckInDateGridPane.addphone(updateCheckInDateText,dashTexts[29],updateCheckInDateText1,dashTexts[30], updateCheckInDateText2);
+        updateCheckInDateGridPane.setAlignment(Pos.CENTER);
+
+        //20,5,20,5
+        myPatientVbox.getChildren().addAll(title1,imageView[1],regions[2],patFName,patFnameText,patLName,patLnameText,patPhone,gridPane1,patGender,patGenderText,regions[18],addPatient,addPatientMessage,regions[3],patID,deletePatientText,regions[19],deletePatient,delPatMessage,updatePatientId,updatePatientIdText,updatePatientFname,updatePatientFnameText,updatePatientLname,updatePatientLnameText,updatePatientPhone,patientPhoneGridPane,updatePatientGender,updatePatientGenderText,updatePatient);
 
         ScrollPane scrollPane1 = new ScrollPane(myPatientVbox);
         scrollPane1.setFitToWidth(true);
         scrollPane1.setFitToHeight(true);
+        MyText colonText = new MyText(":");
+        MyText colonText1= new MyText(":");
 
-        MyText colonText9 = new MyText(":");
-        MyText colonText10 = new MyText(":");
         MyGridPane nurseStartGridPane = new MyGridPane();
-        nurseStartGridPane.addTime(nurseShiftStartText,colonText9,nurseShiftStartText1);
+
+
+        HBox groupTime = new HBox(20,toggleAM,togglePM);
+
+        HBox groupTime1 = new HBox(20,toggleAM1,togglePM1);
+
+        HBox groupTime2 = new HBox(20,toggleAM2,togglePM2);
+
+        HBox groupTime3 = new HBox(20, toggleAM3, togglePM3);
+
+        HBox groupTime4 = new HBox(20, toggleAM4, togglePM4);
+
+
+        nurseStartGridPane.addTime(nurseShiftStartText,colonText,nurseShiftStartText1,groupTime);
         nurseStartGridPane.setAlignment(Pos.CENTER);
 
         MyGridPane nurseEndGridPane = new MyGridPane();
-        nurseEndGridPane.addTime(nurseShiftEndText,colonText10,nurseShiftEndText1);
+        nurseEndGridPane.addTime(nurseShiftEndText,colonText1,nurseShiftEndText1,groupTime1);
         nurseEndGridPane.setAlignment(Pos.CENTER);
 
         MyText title2 = new MyText("Simply Healthy Page Three");
         MyVBox nurseVbox = new MyVBox();
-        nurseVbox.getChildren().addAll(title2,spacer2,nurseFname,nurseFnameText,nurseLname,nurseLnameText,shiftStart,nurseStartGridPane,nurseShiftEnd,nurseEndGridPane,nursePhone,gridPane2,nurseDoctor,nurseDoctorText,spacer9,addNurse,spacer20,delNurse,delNurseText,spacer21,deleteNurse);
-        borderPane2.setTop(nurseVbox);
+        //20,5,20,5
+
+
+
+        nurseVbox.getChildren().addAll(title2,imageView[2],regions[4],nurseFname,nurseFnameText,nurseLname,nurseLnameText,shiftStart,nurseStartGridPane,nurseShiftEnd,nurseEndGridPane,nursePhone,gridPane2,nurseDoctor,nurseDoctorText,addNurseMessage,regions[20],addNurse,regions[5],delNurse,delNurseText,regions[21],deleteNurse,delNurMessage,updateNurseID,updateNurseIDText,updateNurseFname,updateNurseFnameText,updateNurseLname,updateNurselnameText,updateNurseStart,updateNurseSalaryStartGridPane,updateNurseEnd,updateNurseSalaryEndGridPane,updateNursePhone,updateNursePhoneGridPane,updateNurseDocId,updateNurseDocIdText,updateNurse);
+        borderPanes[2].setTop(nurseVbox);
+
+        ScrollPane scrollPane2 = new ScrollPane(nurseVbox);
+        scrollPane2.setFitToHeight(true);
+        scrollPane2.setFitToWidth(true);
+
 
         MyGridPane gridPane3 = new MyGridPane();
         MyGridPane gridPane4 = new MyGridPane();
@@ -1652,7 +2006,7 @@ public class Try extends Application {
         textArea.setMinHeight(500);
         getterVbox.getChildren().addAll(gridPane3,gridPane4,textArea);
 
-        borderPane3.setTop(getterVbox);
+        borderPanes[3].setTop(getterVbox);
 
 
         MyVBox doctorSalaryVBox = new MyVBox();
@@ -1660,69 +2014,275 @@ public class Try extends Application {
         MyGridPane gridPane6 = new MyGridPane();
         gridPane5.setAlignment(Pos.CENTER);
         gridPane6.setAlignment(Pos.CENTER);
-        MyText colonText = new MyText("-");
-        MyText colonText1 = new MyText("-");
-        MyText colonText2 = new MyText("-");
-        MyText colonText3 = new MyText("-");
 
 
-        gridPane5.addphone(docSalaryStartText,colonText,docSalaryStartText1,colonText1,docSalaryStartText2);
-        gridPane6.addphone(docSalaryEndText,colonText2,docSalaryEndText1,colonText3,docSalaryEndText2);
-        doctorSalaryVBox.getChildren().addAll(title3,spacer10,docDocSalaryId,docDocSalaryIdText,docSalaryStart,gridPane5,docSalaryEnd,gridPane6,docSalaryAmount,docSalaryAmountText,spacer13,addDoctorSalary,spacer22,delDocSalary,delDocSalaryText,spacer23,deleteDoctorSalary);
-        borderPane4.setTop(doctorSalaryVBox);
-        MyText colonText4 = new MyText("-");
-        MyText colonText5 = new MyText("-");
-        MyText colonText6 = new MyText("-");
-        MyText colonText7 = new MyText("-");
+
+        gridPane5.addphone(docSalaryStartText,dashTexts[10],docSalaryStartText1,dashTexts[11],docSalaryStartText2);
+        gridPane6.addphone(docSalaryEndText,dashTexts[12],docSalaryEndText1,dashTexts[13],docSalaryEndText2);
+        //20,5,20,5
+        doctorSalaryVBox.getChildren().addAll(title3,imageView[3],regions[6],docDocSalaryId,docDocSalaryIdText,docSalaryStart,gridPane5,docSalaryEnd,gridPane6,docSalaryAmount,docSalaryAmountText,addDoctorSalaryMessage,regions[22],addDoctorSalary,regions[7],delDocSalary,delDocSalaryText,regions[23],deleteDoctorSalary,updateDoctorSalaryID,updateDoctorSalaryIDText,updateDoctorSalaryStart,updateDoctorSalaryStartGridPane,updateDoctorSalaryEnd,updateDoctorSalaryEndGridPane,updateDoctorSalaryAmount,updateDoctorSalaryAmountText,updateDoctorSalary);
+        borderPanes[4].setTop(doctorSalaryVBox);
+
         MyGridPane gridPane7 = new MyGridPane();
         MyGridPane gridPane8 = new MyGridPane();
-        gridPane7.addphone(nurSalaryStartText,colonText4,nurSalaryStartText1,colonText5,nurSalaryStartText2);
-        gridPane8.addphone(nurseSalaryEndText,colonText6,nurseSalaryEndText1,colonText7,nurseSalaryEndText2);
+        gridPane7.addphone(nurSalaryStartText,dashTexts[14],nurSalaryStartText1,dashTexts[15],nurSalaryStartText2);
+        gridPane8.addphone(nurseSalaryEndText,dashTexts[16],nurseSalaryEndText1,dashTexts[17],nurseSalaryEndText2);
         gridPane7.setAlignment(Pos.CENTER);
         gridPane8.setAlignment(Pos.CENTER);
         MyVBox myNurseVBox = new MyVBox();
-        myNurseVBox.getChildren().addAll(title4,spacer11,nurSalaryHistory,nurSalaryHistoryText,nurSalaryStart,gridPane7,nurSalaryEnd,gridPane8,nurSalaryAmount,nurSalaryAmountText,spacer12,addNurseSalary,spacer24,delNurSalary,delNurSalaryText,spacer25,deleteNurseSalary);
-        borderPane5.setTop(myNurseVBox);
+        //20,5,20,5
+        myNurseVBox.getChildren().addAll(title4,imageView[4],regions[8],nurSalaryHistory,nurSalaryHistoryText,nurSalaryStart,gridPane7,nurSalaryEnd,gridPane8,nurSalaryAmount,nurSalaryAmountText,addNurseSalaryMessage,regions[24],addNurseSalary,regions[9],delNurSalary,delNurSalaryText,regions[25],deleteNurseSalary,updateNurseSalaryID,updateNurseSalaryIDText,updateNurseSalaryStart,updateNurseSalaryStartGridPane,updateNurseSalaryEnd,updateNurseSalaryEndGridPane,updateNurseSalaryAmount,updateNurseSalaryAmountText,updateNurseSalary);
+        borderPanes[5].setTop(myNurseVBox);
 
         MyVBox myMedicineVbox = new MyVBox();
-        myMedicineVbox.getChildren().addAll(title5,spacer14,medicineName,medicineNameText,medicineDescription,medicineDescriptionText,medicineTreatment,medicineTreatmentText,spacer15,addMedicine,spacer26,delMedicine,delMedicineText,spacer27,deleteMedicine);
-        borderPane6.setTop(myMedicineVbox);
+        //20,5,20,5
+        myMedicineVbox.getChildren().addAll(title5,imageView[5],regions[10],medicineName,medicineNameText,medicineDescription,medicineDescriptionText,medicineTreatment,medicineTreatmentText,addMedicineMessage,regions[26],addMedicine,regions[11],delMedicine,delMedicineText,regions[27],deleteMedicine,updateMedicineID,updateMedicineIDText,updateMedicineName,updateMedicineNameText,updateMedicineDesc,updateMedicineDescText,updateMedicineTreatment,updateMedicineTreatmentText,updateMedicine);
+        borderPanes[6].setTop(myMedicineVbox);
 
         MyVBox myCheckInVBox = new MyVBox();
         MyGridPane checkInTimeGridPane = new MyGridPane();
         MyText colonText11 = new MyText(":");
-        MyText dashText12 = new MyText("-");
-        MyText dashText13 = new MyText("-");
-        checkInTimeGridPane.addTime(checkInTimeText,colonText11, checkInTImeText1);
+
+        checkInTimeGridPane.addTime(checkInTimeText,colonText11, checkInTImeText1,groupTime2);
         checkInTimeGridPane.setAlignment(Pos.CENTER);
 
         MyGridPane checkInDateGridPane = new MyGridPane();
         checkInDateGridPane.setAlignment(Pos.CENTER);
-        checkInDateGridPane.addphone(checkInDateText,dashText12,checkInDateText1,dashText13,checkInDateText2);
-        myCheckInVBox.getChildren().addAll(title6,spacer16,checkInDoc,checkInDocText,checkInPat,checkInPatText,checkInTime,checkInTimeGridPane,checkInDate,checkInDateGridPane,spacer17,addCheckIn,spacer28,delCheckIn,delCheckInText,spacer29,deleteCheckin);
-        borderPane7.setTop(myCheckInVBox);
+        checkInDateGridPane.addphone(checkInDateText,dashTexts[18],checkInDateText1,dashTexts[19],checkInDateText2);
+        //20,5,20,5
+        myCheckInVBox.getChildren().addAll(title6,imageView[6],regions[12],checkInDoc,checkInDocText,checkInPat,checkInPatText,checkInTime,checkInTimeGridPane,checkInDate,checkInDateGridPane,regions[28],addCheckIn,regions[13],delCheckIn,delCheckInText,regions[29],deleteCheckin,updateCheckInID,updateCheckInIDText,updateCheckInTime,updateCheckInTimeGridPane,updateCheckInDate,updateCheckInDateGridPane,updateCheckIn);
+        borderPanes[7].setTop(myCheckInVBox);
 
         MyVBox myOrderVBox = new MyVBox();
-        myOrderVBox.getChildren().addAll(title7,spacer18,orderPatientID,orderPatientIDText,orderMedicineID,orderMedicineIDText,orderAmount,orderAmountText,spacer19,addOrder,spacer30, delOrder,delOrderText,spacer31,deleteOrder);
-        borderPane8.setTop(myOrderVBox);
-        tab.setContent(scrollPane);
-        tab1.setContent(scrollPane1);
+        myOrderVBox.getChildren().addAll(title7,imageView[7],regions[14],orderPatientID,orderPatientIDText,orderMedicineID,orderMedicineIDText,orderAmount,orderAmountText,regions[30],addOrder,regions[15], delOrder,delOrderText,regions[31],deleteOrder,updateOrderID,updateOrderIDText,updateOrderPatientID,updateOrderPatientIDText,updateOrderMedicineID,updateOrderMedicineIDText,updateOrderQuantity,updateOrderQuantityText,updateOrder);
+        borderPanes[8].setTop(myOrderVBox);
+
+        ScrollPane scrollPane3 = new ScrollPane(doctorSalaryVBox);
+        scrollPane3.setFitToHeight(true);
+        scrollPane3.setFitToWidth(true);
+        ScrollPane scrollPane4 = new ScrollPane(myNurseVBox);
+        scrollPane4.setFitToHeight(true);
+        scrollPane4.setFitToWidth(true);
+        ScrollPane scrollPane5 = new ScrollPane(myMedicineVbox);
+        scrollPane5.setFitToHeight(true);
+        scrollPane5.setFitToWidth(true);
+        ScrollPane scrollPane6 = new ScrollPane(myCheckInVBox);
+        scrollPane6.setFitToHeight(true);
+        scrollPane6.setFitToWidth(true);
+        ScrollPane scrollPane7= new ScrollPane(myOrderVBox);
+        scrollPane7.setFitToHeight(true);
+        scrollPane7.setFitToWidth(true);
+
+        tabs[0].setContent(scrollPane);
+        tabs[1].setContent(scrollPane1);
+        tabs[2].setContent(scrollPane2);
+        tabs[4].setContent(scrollPane3);
+        tabs[5].setContent(scrollPane4);
+        tabs[6].setContent(scrollPane5);
+        tabs[7].setContent(scrollPane6);
+        tabs[8].setContent(scrollPane7);
 
         Scene scene = new Scene( tabPane, 800, 750);
 
-
-
-
-
-
-        primaryStage.setTitle("SQL Query Button");
+        primaryStage.setTitle("Healthcare Database Model");
         primaryStage.setScene(scene);
         primaryStage.show();
 
     }
+    // keeps record of the highest current doctor ID by using a max Query and then adding 1, to
+    // get the new ID for when the user inputs a new doctor in the database
 
-    public static void main(String[] args) {
-        launch(args);
+    private int getDoctorID() {
+        int nextId = 1;
+        String Query = "Select Max(doctor_id) from simplyhealthy.doctor";
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(Query)){
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+        }catch(SQLException ex){
+            ex.printStackTrace();
+
+        }
+        return nextId;
+    }
+    // same as getDoctorID, but for patient record keeping
+    private int getPatientID(){
+        int nextId = 1;
+        String Query = "Select Max(patient_id) from simplyhealthy.patient";
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(Query)){
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+
+        }
+        return nextId;
+    }
+    // same as getDoctorID, but for nurse record keeping
+    private int getNurseID(){
+        int nextId = 1;
+        String Query = "Select Max(nurse_id) from simplyhealthy.nurse";
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(Query)){
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+
+        }
+        return nextId;
+    }
+    // same as getDoctorID, but for medicine record keeping
+    private int getMedicineID(){
+        int nextId = 1;
+        String Query = "Select Max(medicine_id) from simplyhealthy.Medicine";
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(Query)){
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+
+        }
+        return nextId;
+    }
+    // same as getDoctorID, but for check in record keeping
+    private int getcheckInID(){
+        int nextId = 1;
+        String Query = "Select Max(CheckIn_id) from simplyhealthy.Checkin";
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(Query)){
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+
+        }
+        return nextId;
+    }
+    // same as getDoctorID, but for nurse Salary record keeping
+    private int getNurseSalaryID(){
+        int nextId = 1;
+        String Query = "Select Max(nurseSalary_id) from simplyhealthy.nurse_salaryHistory";
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(Query)){
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+
+        }
+        return nextId;
+    }
+    // same as getDoctorID, but for doctor salary record keeping
+    private int getDoctorSalaryID(){
+        int nextId = 1;
+        String Query = "Select Max(doctorSalary_id) from simplyhealthy.doctor_salaryHistory";
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(Query)){
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+
+        }
+        return nextId;
+    }
+    // // same as getDoctorID, but for order record keeping
+    private int getOrderID(){
+        int nextId = 1;
+        String Query = "Select Max(order_id) from simplyhealthy.order";
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(Query)){
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+
+        }
+        return nextId;
     }
 
+    // all of the written prompts/instructions in the Textfields
+    public void setPrompts(){
+        fNameText.setPromptText("Use letters only");
+        lNameText.setPromptText("Use letters only");
+        docPhoneText.setPromptText("Use numbers only");
+        docPhoneText1.setPromptText("Use numbers only");
+        docPhoneText2.setPromptText("Use numbers only");
+        docYOEText.setPromptText("Use numbers only");
+        docEduText.setPromptText("Use letters only");
+        docSpecializationText.setPromptText("Use letters only");
+        deletePatientText.setPromptText("Use numbers only");
+
+        patFnameText.setPromptText("Use letters only");
+        patLnameText.setPromptText("Use letters only");
+        patPhoneText.setPromptText("Use numbers only");
+        patPhoneText1.setPromptText("Use numbers only");
+        patPhoneText2.setPromptText("Use numbers only");
+        patGenderText.setPromptText("Use letters only");
+
+
+        nurseFnameText.setPromptText("Use letters only");
+        nurseLnameText.setPromptText("Use letters only");
+        nurseShiftStartText.setPromptText("hh");
+        nurseShiftStartText1.setPromptText("mm");
+        nurseShiftEndText.setPromptText("hh");
+        nurseShiftEndText1.setPromptText("mm");
+        nursePhoneText.setPromptText("3 digits");
+        nursePhoneText1.setPromptText("3 digits");
+        nursePhoneText2.setPromptText("4 digits");
+        nurseDoctorText.setPromptText("Use numbers only");
+
+        docDocSalaryIdText.setPromptText("Use numbers only");
+        docSalaryStartText.setPromptText("YYYY");
+        docSalaryStartText1.setPromptText("MM");
+        docSalaryStartText2.setPromptText("DD");
+        docSalaryEndText.setPromptText("YYYY");
+        docSalaryEndText1.setPromptText("MM");
+        docSalaryEndText2.setPromptText("DD");
+        docSalaryAmountText.setPromptText("Use numbers only");
+
+        nurSalaryHistoryText.setPromptText("Use numbers only");
+        nurSalaryStartText.setPromptText("YYYY");
+        nurSalaryStartText1.setPromptText("MM");
+        nurSalaryStartText2.setPromptText("DD");
+        nurseSalaryEndText.setPromptText("YYYY");
+        nurseSalaryEndText1.setPromptText("MM");
+        nurseSalaryEndText2.setPromptText("DD");
+        nurSalaryAmountText.setPromptText("Use numbers only");
+
+        medicineNameText.setPromptText("Use letters only");
+        medicineDescriptionText.setPromptText("Use letters only");
+        medicineTreatmentText.setPromptText("Use letters only");
+
+        checkInDocText.setPromptText("Use numbers only");
+        checkInPatText.setPromptText("Use numbers only");
+        checkInDateText.setPromptText("YYYY");
+        checkInDateText1.setPromptText("MM");
+        checkInDateText2.setPromptText("DD");
+        checkInTimeText.setPromptText("hh");
+        checkInTImeText1.setPromptText("mm");
+
+        orderAmountText.setPromptText("Use numbers only");
+        orderMedicineIDText.setPromptText("Use numbers only");
+        orderPatientIDText.setPromptText("Use numbers only");
+    }
 }
